@@ -20,7 +20,7 @@ void _start(void) {
     cr4 |= (1UL<<9) | (1UL<<10);
     __asm__ volatile("mov %0, %%cr4" : : "r"(cr4));
     serial_init();
-    serial_puts("\nluaos milestone 2: limine booted the kernel\n");
+    serial_puts("\nmoonos milestone 2: limine booted the kernel\n");
 
     if (fb_req.response == 0 || fb_req.response->framebuffer_count == 0) {
         serial_puts("no framebuffer\n");
@@ -43,5 +43,6 @@ void _start(void) {
         __asm__ volatile("hlt");
     }
 }
+
 
 
