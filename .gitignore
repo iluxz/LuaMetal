@@ -1,0 +1,5 @@
+build/
+build2.ps1
+*.o
+*.elf
+*.log
