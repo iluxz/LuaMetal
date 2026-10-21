@@ -87,7 +87,7 @@
   <header>
     <div class="container">
       <h1>LuaMetal</h1>
-      <p class="tagline">An operating system written in Lua — bare metal, no Linux, no distro.</p>
+      <p class="tagline">An operating system written in Lua.</p>
       <a href="https://github.com/iluxz/LuaMetal" class="cta">View on GitHub</a>
       <a href="https://github.com/iluxz/LuaMetal#building" class="cta secondary">Get Started</a>
     </div>
@@ -95,17 +95,16 @@
 
   <section>
     <div class="container">
-      <h2>Hello, bare metal</h2>
+      <h2>Hello, world</h2>
       <div class="code-block">
-        <span class="comment">-- real Lua 5.4 running on real bare metal</span><br>
-        <span class="comment">-- no OS underneath it</span><br><br>
-        <span class="keyword">print</span>(<span class="string">"hello from lua on bare metal!"</span>)<br><br>
+        <span class="comment">-- real Lua 5.4, running inside the kernel</span><br><br>
+        <span class="keyword">print</span>(<span class="string">"hello from lua!"</span>)<br><br>
         <span class="keyword">for</span> i = <span class="string">1</span>, <span class="string">5</span> <span class="keyword">do</span><br>
         &nbsp;&nbsp;<span class="keyword">print</span>(<span class="string">"count "</span> .. i)<br>
         <span class="keyword">end</span><br><br>
         <span class="keyword">print</span>(<span class="string">"2 + 2 = "</span> .. <span class="string">2</span> + <span class="string">2</span>)
         <div class="output">
-          hello from lua on bare metal!<br>
+          hello from lua!<br>
           count 1<br>
           count 2<br>
           count 3<br>
@@ -123,11 +122,11 @@
       <div class="features">
         <div class="feature">
           <h3>From scratch</h3>
-          <p>No Linux, no distro, no libc. A freestanding C kernel with Lua 5.4 compiled directly into it.</p>
+          <p>A freestanding C kernel with Lua 5.4 compiled directly into it. No libc, no userspace baggage.</p>
         </div>
         <div class="feature">
-          <h3>Bare metal Lua</h3>
-          <p>Lua 5.4.8 runs freestanding on x86_64. The kernel boots via Limine UEFI and drops into a real Lua interpreter.</p>
+          <h3>Bare metal</h3>
+          <p>Lua 5.4.8 runs directly on x86_64 hardware. The kernel boots via Limine UEFI and drops into a real Lua interpreter.</p>
         </div>
         <div class="feature">
           <h3>Modern desktop (soon)</h3>
