@@ -82,6 +82,7 @@ void lua_run(const char **bufs, unsigned long *lens, int nmods) {
                 serial_puts("\n");
                 lua_pop(L, 1);
             }
+            for (volatile int d = 0; d < 800000; d++) {} /* ~8ms: cap redraw rate, kills tearing */
         }
     }
 
