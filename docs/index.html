@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuaMetal — an OS written in Lua</title>
+  <style>
+    :root {
+      --lua-blue: #2C2D72;
+      --lua-blue-light: #3d3e99;
+      --bg: #0a0a12;
+      --surface: #12121f;
+      --text: #e8e8f0;
+      --muted: #8888a8;
+      --accent: #7A5CFF;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+    header {
+      padding: 80px 0 60px;
+      text-align: center;
+      background: radial-gradient(ellipse at top, var(--lua-blue) 0%, var(--bg) 70%);
+    }
+    h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+    .tagline { font-size: 1.4rem; color: var(--muted); margin-bottom: 32px; }
+    .cta {
+      display: inline-block;
+      padding: 14px 32px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(122,92,255,0.4); }
+    .cta.secondary { background: transparent; border: 2px solid var(--accent); margin-left: 12px; }
+    section { padding: 60px 0; }
+    h2 { font-size: 2rem; margin-bottom: 24px; color: var(--accent); }
+    .code-block {
+      background: var(--surface);
+      border: 1px solid #2a2a44;
+      border-radius: 12px;
+      padding: 24px;
+      font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 0.95rem;
+      overflow-x: auto;
+      color: #c8c8e8;
+    }
+    .code-block .comment { color: #6a6a8a; }
+    .code-block .string { color: #7ec8a0; }
+    .code-block .keyword { color: var(--accent); }
+    .code-block .output { color: #e8c870; margin-top: 16px; padding-top: 16px; border-top: 1px solid #2a2a44; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+    .feature {
+      background: var(--surface);
+      border: 1px solid #2a2a44;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .feature h3 { color: var(--accent); margin-bottom: 8px; font-size: 1.2rem; }
+    .feature p { color: var(--muted); font-size: 0.95rem; }
+    footer {
+      padding: 40px 0;
+      text-align: center;
+      color: var(--muted);
+      border-top: 1px solid #1a1a2e;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>LuaMetal</h1>
+      <p class="tagline">An operating system written in Lua — bare metal, no Linux, no distro.</p>
+      <a href="https://github.com/iluxz/LuaMetal" class="cta">View on GitHub</a>
+      <a href="https://github.com/iluxz/LuaMetal#building" class="cta secondary">Get Started</a>
+    </div>
+  </header>
+
+  <section>
+    <div class="container">
+      <h2>Hello, bare metal</h2>
+      <div class="code-block">
+        <span class="comment">-- real Lua 5.4 running on real bare metal</span><br>
+        <span class="comment">-- no OS underneath it</span><br><br>
+        <span class="keyword">print</span>(<span class="string">"hello from lua on bare metal!"</span>)<br><br>
+        <span class="keyword">for</span> i = <span class="string">1</span>, <span class="string">5</span> <span class="keyword">do</span><br>
+        &nbsp;&nbsp;<span class="keyword">print</span>(<span class="string">"count "</span> .. i)<br>
+        <span class="keyword">end</span><br><br>
+        <span class="keyword">print</span>(<span class="string">"2 + 2 = "</span> .. <span class="string">2</span> + <span class="string">2</span>)
+        <div class="output">
+          hello from lua on bare metal!<br>
+          count 1<br>
+          count 2<br>
+          count 3<br>
+          count 4<br>
+          count 5<br>
+          2 + 2 = 4
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>How it works</h2>
+      <div class="features">
+        <div class="feature">
+          <h3>From scratch</h3>
+          <p>No Linux, no distro, no libc. A freestanding C kernel with Lua 5.4 compiled directly into it.</p>
+        </div>
+        <div class="feature">
+          <h3>Bare metal Lua</h3>
+          <p>Lua 5.4.8 runs freestanding on x86_64. The kernel boots via Limine UEFI and drops into a real Lua interpreter.</p>
+        </div>
+        <div class="feature">
+          <h3>Modern desktop (soon)</h3>
+          <p>A desktop environment that actually looks good. Not 2011 Ubuntu. Not TempleOS. Something modern.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>LuaMetal is open source under the <a href="https://github.com/iluxz/LuaMetal/blob/master/LICENSE">MIT License</a> · Made by <a href="https://github.com/iluxz">iluxz</a></p>
+    </div>
+  </footer>
+</body>
+</html>
