@@ -189,9 +189,11 @@ function step()
   if dirty then
     draw()
     draw_cursor(mx, my)
+    gfx.flip()
   end
 end
 
 draw()
 draw_cursor(input.mx(), input.my())
+gfx.flip()
 print("desktop ready: " .. W .. "x" .. H .. " — step loop engaged")

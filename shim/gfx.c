@@ -5,6 +5,7 @@
 #include "gfx.h"
 
 static uint8_t  *g_fb;
+static uint8_t  *g_back;
 static uint64_t  g_width, g_height, g_pitch;
 static uint16_t  g_bpp;
 static uint8_t   g_rs, g_rsh;
@@ -12,6 +13,7 @@ static uint8_t   g_gs, g_gh;
 static uint8_t   g_bs, g_bsh;
 
 void gfx_set_framebuffer(struct limine_framebuffer *fb) {
+    extern void *malloc(size_t);
     g_fb    = (uint8_t *)fb->address;
     g_width = fb->width;
     g_height= fb->height;
@@ -20,6 +22,7 @@ void gfx_set_framebuffer(struct limine_framebuffer *fb) {
     g_rs = fb->red_mask_size;   g_rsh = fb->red_mask_shift;
     g_gs = fb->green_mask_size; g_gh  = fb->green_mask_shift;
     g_bs = fb->blue_mask_size;  g_bsh = fb->blue_mask_shift;
+    g_back = (uint8_t *)malloc(g_width * g_height * 4);
 }
 
 /* scale an 8-bit channel (0-255) into an n-bit mask */
@@ -40,11 +43,21 @@ static inline uint32_t conv(uint32_t c) {
 static inline void put(uint32_t px, int x, int y) {
     if (x < 0 || y < 0 || x >= (int)g_width || y >= (int)g_height) return;
     if (g_bpp == 32) {
-        uint32_t *row = (uint32_t *)(g_fb + (uint64_t)y * g_pitch);
+        uint32_t *row = (uint32_t *)(g_back + (uint64_t)y * g_width * 4);
         row[x] = px;
     } else if (g_bpp == 24) {
-        uint8_t *p = g_fb + (uint64_t)y * g_pitch + (uint64_t)x * 3;
+        uint8_t *p = g_back + (uint64_t)y * g_width * 4 + (uint64_t)x * 3;
         p[0] = px & 0xFF; p[1] = (px >> 8) & 0xFF; p[2] = (px >> 16) & 0xFF;
+    }
+}
+
+/* present the back buffer to the real framebuffer in one pass */
+void gfx_flip(void) {
+    uint64_t rowbytes = g_width * (g_bpp == 32 ? 4 : 3);
+    for (uint64_t y = 0; y < g_height; y++) {
+        uint8_t *src = g_back + y * g_width * 4;
+        uint8_t *dst = g_fb + y * g_pitch;
+        for (uint64_t i = 0; i < rowbytes; i++) dst[i] = src[i];
     }
 }
 
@@ -78,16 +91,19 @@ static int l_rect(lua_State *L) {
 static int l_clear(lua_State *L) {
     uint32_t c = (uint32_t)luaL_optinteger(L, 1, 0x000000);
     uint32_t px = conv(c);
-    for (uint64_t j = 0; j < g_height; j++) {
-        if (g_bpp == 32) {
-            uint32_t *row = (uint32_t *)(g_fb + j * g_pitch);
+    if (g_bpp == 32) {
+        for (uint64_t j = 0; j < g_height; j++) {
+            uint32_t *row = (uint32_t *)(g_back + j * g_width * 4);
             for (uint64_t i = 0; i < g_width; i++) row[i] = px;
-        } else {
-            for (uint64_t i = 0; i < g_width; i++) put(px, (int)i, (int)j);
         }
+    } else {
+        for (uint64_t j = 0; j < g_height; j++)
+            for (uint64_t i = 0; i < g_width; i++) put(px, (int)i, (int)j);
     }
     return 0;
 }
+
+static int l_flip(lua_State *L) { (void)L; gfx_flip(); return 0; }
 
 void gfx_register(lua_State *L) {
     static const luaL_Reg fns[] = {
@@ -96,6 +112,7 @@ void gfx_register(lua_State *L) {
         {"pixel",  l_pixel},
         {"rect",   l_rect},
         {"clear",  l_clear},
+        {"flip",   l_flip},
         {NULL, NULL}
     };
     luaL_newlib(L, fns);
