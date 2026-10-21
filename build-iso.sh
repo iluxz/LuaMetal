@@ -14,6 +14,8 @@ mkdir -p "$ISO_ROOT/EFI/BOOT"
 # ESP contents
 cp "$BUILD/esp/kernel.elf"      "$ISO_ROOT/"
 cp "$BUILD/esp/limine.conf"     "$ISO_ROOT/"
+cp "$BUILD/esp/font.lua"        "$ISO_ROOT/"
+cp "$BUILD/esp/gfx.lua"         "$ISO_ROOT/"
 cp "$BUILD/esp/init.lua"        "$ISO_ROOT/"
 cp "$BUILD/esp/EFI/BOOT/BOOTX64.EFI" "$ISO_ROOT/EFI/BOOT/"
 

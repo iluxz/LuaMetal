@@ -26,13 +26,14 @@ jobs:
           clang $CF -c shim/serial.c -o build/serial.o
           clang $CF -c shim/libc_shim.c -o build/libc_shim.o
           clang $CF -c shim/lua_run.c -o build/lua_run.o
+          clang $CF -c shim/gfx.c -o build/gfx.o
           clang $CF -c kernel.c -o build/kernel.o
 
           for f in lapi lcode lctype ldebug ldo ldump lfunc lgc llex lmem lobject lopcodes lparser lstate lstring ltable ltm lundump lvm lzio lbaselib lauxlib linit lcorolib ltablib lstrlib lmathlib lutf8lib ldblib loadlib liolib loslib; do
             clang $CF -c lua-5.4.8/src/$f.c -o build/lua_$f.o
           done
 
-          ld.lld -nostdlib -T linker.ld build/kernel.o build/serial.o build/libc_shim.o build/lua_*.o -o build/kernel.elf
+          ld.lld -nostdlib -T linker.ld build/kernel.o build/serial.o build/libc_shim.o build/gfx.o build/lua_*.o -o build/kernel.elf
 
       - name: Check kernel is valid ELF
         run: |

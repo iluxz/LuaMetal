@@ -1,3 +1,6 @@
 # Mark vendored third-party code so GitHub language stats reflect our own code
 lua-5.4.8/** linguist-vendored
 limine/** linguist-vendored
+
+# Shell scripts must stay LF (Windows git autocrlf would break them)
+*.sh text eol=lf

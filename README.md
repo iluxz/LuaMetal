@@ -20,7 +20,7 @@ LuaMetal is early. Very early. Here's the roadmap:
 - [x] **Milestone 1** — UEFI boot via Limine, serial output, framebuffer
 - [x] **Milestone 2** — Lua 5.4.8 interpreter running freestanding in the kernel
 - [x] **Milestone 3** — load and run real `.lua` files from disk as the OS's init program
-- [ ] **Milestone 4** — desktop environment (a modern one, not 2011 Ubuntu)
+- [ ] **Milestone 4** — desktop environment (a modern one, not 2011 Ubuntu) — *in progress: window, taskbar and font renderer all draw in Lua*
 - [ ] **Milestone 5** — userspace, drivers, the works
 
 ## Hello, world
