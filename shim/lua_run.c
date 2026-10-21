@@ -2,11 +2,11 @@
 #include <lauxlib.h>
 #include <lualib.h>
 #include "serial.h"
+#include "gfx.h"
 
 static void *my_alloc(void *ud, void *ptr, size_t osize, size_t nsize) {
     (void)ud; (void)osize;
     if (nsize == 0) return NULL;
-    /* use libc malloc */
     extern void *malloc(size_t);
     extern void *realloc(void*,size_t);
     if (!ptr) return malloc(nsize);
@@ -27,39 +27,29 @@ static int l_print_serial(lua_State *L) {
     return 0;
 }
 
-void lua_run(const char *buf, unsigned long len) {
+void lua_run(const char **bufs, unsigned long *lens, int nmods) {
     serial_puts("[lua] creating state\n");
     lua_State *L = lua_newstate(my_alloc, NULL);
-    serial_puts("[lua] newstate returned\n");
     if (!L) { serial_puts("[lua] failed to create state\n"); return; }
-    serial_puts("[lua] opening libs\n");
     luaL_openlibs(L);
     lua_pushcfunction(L, l_print_serial);
     lua_setglobal(L, "print");
-    serial_puts("[lua] running script\n");
+    gfx_register(L);
+    serial_puts("[lua] gfx module registered\n");
 
-    int rc;
-    if (buf && len) {
-        /* run the boot-loaded init.lua */
-        rc = luaL_loadbufferx(L, buf, len, "init.lua", "t");
+    for (int i = 0; i < nmods; i++) {
+        serial_puts("[lua] running module\n");
+        int rc = luaL_loadbufferx(L, bufs[i], lens[i], "module", "t");
         if (rc == LUA_OK) rc = lua_pcall(L, 0, LUA_MULTRET, 0);
-    } else {
-        /* fallback embedded script */
-        const char *script =
-            "print('hello from lua on bare metal!')\n"
-            "for i=1,5 do print('count', i) end\n"
-            "print('2+2 =', 2+2)\n";
-        rc = luaL_dostring(L, script);
+        if (rc != LUA_OK) {
+            const char *err = lua_tostring(L, -1);
+            serial_puts("[lua] error: ");
+            serial_puts(err ? err : "(unknown)");
+            serial_puts("\n");
+            lua_pop(L, 1);
+        }
     }
 
-    if (rc != LUA_OK) {
-        const char *err = lua_tostring(L, -1);
-        serial_puts("[lua] error: ");
-        serial_puts(err ? err : "(unknown)");
-        serial_puts("\n");
-    } else {
-        serial_puts("[lua] script done\n");
-    }
     lua_close(L);
     serial_puts("[lua] closed\n");
 }
