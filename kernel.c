@@ -16,6 +16,7 @@ static volatile struct limine_module_request mod_req = {
 };
 
 void lua_run(const char **bufs, unsigned long *lens, int n);
+void input_init(void);
 
 void _start(void) {
     unsigned long cr0, cr4;
@@ -54,6 +55,9 @@ void _start(void) {
         }
     }
     if (n == 0) serial_puts("[init] no modules found\n");
+
+    input_init();
+    serial_puts("ps/2 input online\n");
 
     lua_run(bufs, lens, n);
 

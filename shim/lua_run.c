@@ -3,6 +3,7 @@
 #include <lualib.h>
 #include "serial.h"
 #include "gfx.h"
+#include "input.h"
 
 static void *my_alloc(void *ud, void *ptr, size_t osize, size_t nsize) {
     (void)ud; (void)osize;
@@ -27,6 +28,20 @@ static int l_print_serial(lua_State *L) {
     return 0;
 }
 
+static int l_mx(lua_State *L) { lua_pushinteger(L, input_x()); return 1; }
+static int l_my(lua_State *L) { lua_pushinteger(L, input_y()); return 1; }
+static int l_btn(lua_State *L) { lua_pushinteger(L, input_btn()); return 1; }
+static int l_scancode(lua_State *L) { lua_pushinteger(L, input_scancode()); return 1; }
+
+static void input_register(lua_State *L) {
+    static const luaL_Reg fns[] = {
+        {"mx", l_mx}, {"my", l_my}, {"btn", l_btn}, {"scancode", l_scancode},
+        {NULL, NULL}
+    };
+    luaL_newlib(L, fns);
+    lua_setglobal(L, "input");
+}
+
 void lua_run(const char **bufs, unsigned long *lens, int nmods) {
     serial_puts("[lua] creating state\n");
     lua_State *L = lua_newstate(my_alloc, NULL);
@@ -35,7 +50,8 @@ void lua_run(const char **bufs, unsigned long *lens, int nmods) {
     lua_pushcfunction(L, l_print_serial);
     lua_setglobal(L, "print");
     gfx_register(L);
-    serial_puts("[lua] gfx module registered\n");
+    input_register(L);
+    serial_puts("[lua] gfx + input modules registered\n");
 
     for (int i = 0; i < nmods; i++) {
         serial_puts("[lua] running module\n");
@@ -47,6 +63,25 @@ void lua_run(const char **bufs, unsigned long *lens, int nmods) {
             serial_puts(err ? err : "(unknown)");
             serial_puts("\n");
             lua_pop(L, 1);
+        }
+    }
+
+    /* main loop: if init.lua defined step(), poll input and run it forever */
+    lua_getglobal(L, "step");
+    int has_step = lua_isfunction(L, -1);
+    lua_pop(L, 1);
+    if (has_step) {
+        serial_puts("[lua] entering step loop\n");
+        for (;;) {
+            input_poll();
+            lua_getglobal(L, "step");
+            if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+                const char *err = lua_tostring(L, -1);
+                serial_puts("[lua] step error: ");
+                serial_puts(err ? err : "?");
+                serial_puts("\n");
+                lua_pop(L, 1);
+            }
         }
     }
 

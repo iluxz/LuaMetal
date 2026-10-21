@@ -51,6 +51,9 @@ static inline void put(uint32_t px, int x, int y) {
 static int l_width(lua_State *L)  { lua_pushinteger(L, (lua_Integer)g_width);  return 1; }
 static int l_height(lua_State *L) { lua_pushinteger(L, (lua_Integer)g_height); return 1; }
 
+int gfx_width(void)  { return (int)g_width; }
+int gfx_height(void) { return (int)g_height; }
+
 static int l_pixel(lua_State *L) {
     int x = (int)luaL_checkinteger(L, 1);
     int y = (int)luaL_checkinteger(L, 2);
