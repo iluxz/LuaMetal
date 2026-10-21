@@ -32,7 +32,7 @@ jobs:
             clang $CF -c lua-5.4.8/src/$f.c -o build/lua_$f.o
           done
 
-          ld.lld -nostdlib -T linker.ld build/kernel.o build/serial.o build/libc_shim.o build/lua_run.o build/lua_*.o -o build/kernel.elf
+          ld.lld -nostdlib -T linker.ld build/kernel.o build/serial.o build/libc_shim.o build/lua_*.o -o build/kernel.elf
 
       - name: Check kernel is valid ELF
         run: |
