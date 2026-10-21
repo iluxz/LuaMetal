@@ -19,13 +19,14 @@ LuaMetal is early. Very early. Here's the roadmap:
 
 - [x] **Milestone 1** — UEFI boot via Limine, serial output, framebuffer
 - [x] **Milestone 2** — Lua 5.4.8 interpreter running freestanding in the kernel
-- [ ] **Milestone 3** — run real `.lua` files as the OS's init/first programs
+- [x] **Milestone 3** — load and run real `.lua` files from disk as the OS's init program
 - [ ] **Milestone 4** — desktop environment (a modern one, not 2011 Ubuntu)
 - [ ] **Milestone 5** — userspace, drivers, the works
 
 ## Hello, world
 
-This is real Lua 5.4 running inside the kernel:
+The kernel loads `init.lua` from disk at boot and runs it as the OS's first
+program — edit the file, reboot, done:
 
 ```lua
 print("hello from lua!")
