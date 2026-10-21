@@ -1,0 +1,92 @@
+name: PR Bot
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issues:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+jobs:
+  welcome-pr:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = [
+              `👋 hey @${pr.user.login}, thanks for the PR!`,
+              ``,
+              `A maintainer will review this soon. Make sure the **CI** is green before asking for review.`,
+              ``,
+              `— ${context.repo.owner}/${context.repo.repo} bot`
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body
+            });
+
+  welcome-issue:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issue' && github.event.action == 'opened'
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = [
+              `👋 hey @${issue.user.login}, thanks for opening an issue!`,
+              ``,
+              `A maintainer will take a look. Please fill out the details so we can help faster.`,
+              ``,
+              `— ${context.repo.owner}/${context.repo.repo} bot`
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body
+            });
+
+  label-pr:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number
+            });
+
+            const labels = new Set();
+            for (const f of files) {
+              const p = f.filename;
+              if (p.startsWith('.github/')) labels.add('ci');
+              if (p.endsWith('.md')) labels.add('documentation');
+              if (p.startsWith('shim/') || p === 'kernel.c' || p === 'linker.ld') labels.add('kernel');
+              if (p.startsWith('lua-5.4.8/')) labels.add('lua');
+              if (p.startsWith('docs/')) labels.add('documentation');
+            }
+            if (pr.title.toLowerCase().includes('fix') || pr.title.toLowerCase().includes('bug')) {
+              labels.add('bug');
+            }
+            if (labels.size === 0) labels.add('enhancement');
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: [...labels]
+            });
