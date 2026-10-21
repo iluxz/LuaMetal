@@ -27,22 +27,32 @@ static int l_print_serial(lua_State *L) {
     return 0;
 }
 
-void lua_run(void) {
+void lua_run(const char *buf, unsigned long len) {
     serial_puts("[lua] creating state\n");
     lua_State *L = lua_newstate(my_alloc, NULL);
     serial_puts("[lua] newstate returned\n");
     if (!L) { serial_puts("[lua] failed to create state\n"); return; }
     serial_puts("[lua] opening libs\n");
     luaL_openlibs(L);
-    serial_puts("[lua] libs opened\n");
     lua_pushcfunction(L, l_print_serial);
     lua_setglobal(L, "print");
     serial_puts("[lua] running script\n");
-    const char *script =
-        "print('hello from lua on bare metal!')\n"
-        "for i=1,5 do print('count', i) end\n"
-        "print('2+2 =', 2+2)\n";
-    if (luaL_dostring(L, script) != LUA_OK) {
+
+    int rc;
+    if (buf && len) {
+        /* run the boot-loaded init.lua */
+        rc = luaL_loadbufferx(L, buf, len, "init.lua", "t");
+        if (rc == LUA_OK) rc = lua_pcall(L, 0, LUA_MULTRET, 0);
+    } else {
+        /* fallback embedded script */
+        const char *script =
+            "print('hello from lua on bare metal!')\n"
+            "for i=1,5 do print('count', i) end\n"
+            "print('2+2 =', 2+2)\n";
+        rc = luaL_dostring(L, script);
+    }
+
+    if (rc != LUA_OK) {
         const char *err = lua_tostring(L, -1);
         serial_puts("[lua] error: ");
         serial_puts(err ? err : "(unknown)");
