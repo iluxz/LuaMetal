@@ -1,6 +1,6 @@
 # LuaMetal
 
-> An operating system written in Lua, from scratch — Lua 5.4 running on x86_64.
+> An operating system written in Lua, made from scratch — Lua 5.4 running on x86_64.
 
 [![CI](https://github.com/iluxz/LuaMetal/actions/workflows/build.yml/badge.svg)](https://github.com/iluxz/LuaMetal/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
